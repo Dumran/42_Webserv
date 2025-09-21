@@ -6,7 +6,7 @@
 /*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:20:18 by mehkekli          #+#    #+#             */
-/*   Updated: 2025/09/21 15:20:19 by mehkekli         ###   ########.fr       */
+/*   Updated: 2025/09/21 16:54:30 by mehkekli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -727,24 +727,23 @@ std::vector<Server> Config::parse(const std::string& filename)
 std::vector<Config> Config::set(std::vector<Server> &servers)
 {
     std::vector<Config> grouped;
+
+    std::map<int, int> port_counts;
+    for (size_t i = 0; i < servers.size(); ++i)
+        ++port_counts[servers[i].getPort()];
+
+    for (std::map<int, int>::const_iterator it = port_counts.begin(); it != port_counts.end(); ++it) {
+        if (it->second > 1) {
+            std::cerr << "webserv: conflicting listen directive, multiple server blocks use port " << it->first << std::endl;
+            std::vector<Config> empty;
+            return empty;
+        }
+    }
+
     while (!servers.empty()) {
         Server base = servers.front();
         Config group;
         group.setDefault(base);
-        for (size_t j = 1; j < servers.size(); ++j) {
-            if (servers[j].getPort() == base.getPort()) {
-                group.getDefault().insertServerNames(servers[j].getServerNames());
-                group.getDefault().setClientMaxBodySize(std::max(
-                    group.getDefault().getClientMaxBodySize(),
-                    servers[j].getClientMaxBodySize()
-                ));
-                group.getDefault().insertLocations(servers[j].getLocations());
-                group.getDefault().insertErrorPages(servers[j].getErrorPages());
-                group.getDefault().addPossibleServer(servers[j]);
-                servers.erase(servers.begin() + j);
-                --j;
-            }
-        }
         group.possible_servers.insert(group.possible_servers.begin(), base);
         servers.erase(servers.begin());
         grouped.push_back(group);

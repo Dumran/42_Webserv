@@ -6,7 +6,7 @@
 /*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:15:57 by mehkekli          #+#    #+#             */
-/*   Updated: 2025/09/21 15:15:58 by mehkekli         ###   ########.fr       */
+/*   Updated: 2025/09/21 16:54:34 by mehkekli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,13 @@ static bool build_config_from_file(const char* filename)
     }
 
     config = Config::set(pureServers);
+
+    if (config.empty())
+    {
+        std::cerr << "webserv: invalid configuration - conflicting listen ports detected." << std::endl;
+        return false;
+    }
+
     Log::info("Configuration file parsed");
     return true;
 }
