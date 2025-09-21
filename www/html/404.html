@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Chunk Bulunamadı</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: #37474F;
+            background-image:
+                /* Stone block pattern */
+                repeating-linear-gradient(
+                    0deg,
+                    #263238 0%,
+                    #263238 4px,
+                    #37474F 4px,
+                    #37474F 8px,
+                    #455A64 8px,
+                    #455A64 12px,
+                    #546E7A 12px,
+                    #546E7A 16px,
+                    #607D8B 16px,
+                    #607D8B 20px,
+                    #546E7A 20px,
+                    #546E7A 24px,
+                    #37474F 24px,
+                    #37474F 28px,
+                    #263238 28px,
+                    #263238 32px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0,0,0,0.2) 0%,
+                    rgba(0,0,0,0.2) 2px,
+                    transparent 2px,
+                    transparent 4px
+                ),
+                /* Crack pattern for broken feel */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent 0%,
+                    transparent 15px,
+                    rgba(0,0,0,0.3) 15px,
+                    rgba(0,0,0,0.3) 16px,
+                    transparent 16px,
+                    transparent 31px
+                ),
+                /* Block grid */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0,
+                    transparent 31px,
+                    rgba(0,0,0,0.4) 31px,
+                    rgba(0,0,0,0.4) 32px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0,
+                    transparent 31px,
+                    rgba(0,0,0,0.4) 31px,
+                    rgba(0,0,0,0.4) 32px
+                );
+            background-size: 32px 32px;
+            color: #333;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Animated clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .cloud:before {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+        }
+
+        .cloud:after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 30px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .cloud1:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1:after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 60px;
+            height: 25px;
+            top: 30%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+
+        .cloud2:before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 5px;
+        }
+
+        .cloud2:after {
+            width: 50px;
+            height: 30px;
+            top: -10px;
+            right: 5px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-10px) translateX(5px); }
+            50% { transform: translateY(0px) translateX(10px); }
+            75% { transform: translateY(-5px) translateX(5px); }
+        }
+
+        .error-container {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            padding: 40px;
+            border: 4px solid #654321;
+            border-radius: 12px;
+            box-shadow: 
+                0 0 0 2px #5D4037,
+                4px 4px 16px rgba(0,0,0,0.5),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 10;
+            max-width: 500px;
+        }
+
+        .error-container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: linear-gradient(45deg, #3E2723, #5D4037);
+            z-index: -1;
+            border-radius: 16px;
+        }
+        
+        h1 {
+            font-size: 96px;
+            color: #f44336;
+            text-shadow: 6px 6px 0px #000, 3px 3px 0px #c62828;
+            margin-bottom: 25px;
+            animation: glitch 1.5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-3px); }
+            20% { transform: translateX(3px); }
+            30% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+        }
+        
+        p {
+            font-size: 16px;
+            margin: 25px 0 35px;
+            color: white;
+            text-shadow: 2px 2px 0px #000;
+            line-height: 1.8;
+        }
+        
+        a {
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            padding: 20px 30px;
+            border: 4px solid #1565C0;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 16px;
+            text-shadow: 2px 2px 0px #000;
+            transition: all 0.2s;
+            box-shadow: 4px 4px 0px #0D47A1;
+            font-family: 'Press Start 2P', monospace;
+        }
+        
+        a:hover {
+            background: linear-gradient(135deg, #42A5F5, #64B5F6);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #0D47A1;
+        }
+
+        a:active {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0px #0D47A1;
+        }
+
+        .creeper {
+            font-size: 32px;
+            margin: 25px 0;
+            animation: bounce 2.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.1); }
+        }
+
+        /* Minecraft block pattern overlay */
+        .error-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(0, 0, 0, 0.1) 16px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(0, 0, 0, 0.1) 16px
+                );
+            pointer-events: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    
+    <div class="error-container">
+        <h1>404</h1>
+        <div class="creeper">💚💚💚<br>💚⬛💚<br>💚💚💚</div>
+        <p>Üzgünüz, aradığınız chunk bulunamadı!<br>
+        Belki de bir Creeper tarafından patlatılmıştır...</p>
+        <a href="/">🏠 Ana Sayfaya Dön</a>
+    </div>
+</body>
+</html>

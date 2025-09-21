@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Yükleme - Minecraft</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #8BC34A;
+            background-image:
+                /* Grass/nature theme */
+                linear-gradient(180deg, #8BC34A 0%, #7CB342 50%, #689F38 100%),
+                /* Subtle texture */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent 0px,
+                    transparent 2px,
+                    rgba(0,0,0,0.03) 2px,
+                    rgba(0,0,0,0.03) 4px
+                );
+            position: relative;
+        }
+
+        /* Floating elements */
+        body::before {
+            content: '📤';
+            position: fixed;
+            top: 20%;
+            left: 15%;
+            font-size: 32px;
+            animation: float 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '⬆️';
+            position: fixed;
+            bottom: 20%;
+            right: 15%;
+            font-size: 24px;
+            animation: float 6s ease-in-out infinite reverse;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            25% { transform: translateY(-20px) rotate(5deg); opacity: 1; }
+            50% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+            75% { transform: translateY(-10px) rotate(-3deg); opacity: 0.9; }
+        }
+
+        .container {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            padding: 40px;
+            border: 4px solid #654321;
+            border-radius: 12px;
+            box-shadow: 
+                0 0 0 2px #5D4037,
+                8px 8px 16px rgba(0,0,0,0.4),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            margin: 20px;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: linear-gradient(45deg, #3E2723, #5D4037);
+            z-index: -1;
+            border-radius: 16px;
+        }
+
+        h2 {
+            margin-bottom: 35px;
+            color: white;
+            font-size: 18px;
+            text-shadow: 3px 3px 0px #000;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        h2::before {
+            content: '🔨';
+            margin-right: 15px;
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            padding: 25px 35px;
+            border: 4px solid #2E7D32;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0px #000;
+            transition: all 0.2s;
+            box-shadow: 4px 4px 0px #1B5E20;
+            font-family: 'Press Start 2P', monospace;
+            position: relative;
+        }
+
+        .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        .upload-btn:hover {
+            background: linear-gradient(135deg, #66BB6A, #81C784);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #1B5E20;
+        }
+
+        .upload-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1B5E20;
+        }
+
+        .file-info {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            color: white;
+            font-size: 12px;
+            text-shadow: 1px 1px 0px #000;
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        button, .button_2 {
+            padding: 20px 30px;
+            font-size: 16px;
+            border: 4px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            text-shadow: 2px 2px 0px #000;
+            transition: all 0.2s;
+            font-family: 'Press Start 2P', monospace;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button::before,
+        .button_2::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            border-color: #1565C0;
+            box-shadow: 4px 4px 0px #0D47A1;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #42A5F5, #64B5F6);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #0D47A1;
+        }
+
+        .button_2 {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            border-color: #c62828;
+            box-shadow: 4px 4px 0px #b71c1c;
+        }
+
+        .button_2:hover {
+            background: linear-gradient(135deg, #ef5350, #e57373);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #b71c1c;
+        }
+
+        button:active, .button_2:active {
+            transform: translate(2px, 2px);
+        }
+
+        button:active {
+            box-shadow: 2px 2px 0px #0D47A1;
+        }
+
+        .button_2:active {
+            box-shadow: 2px 2px 0px #b71c1c;
+        }
+
+        .message {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            border: 3px solid;
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+
+        .success {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            border-color: #2E7D32;
+            box-shadow: 2px 2px 0px #1B5E20;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+            border-color: #c62828;
+            box-shadow: 2px 2px 0px #b71c1c;
+        }
+
+        /* Minecraft block pattern overlay */
+        .container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(0, 0, 0, 0.1) 16px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(0, 0, 0, 0.1) 16px
+                );
+            pointer-events: none;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                padding: 30px 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button, .button_2 {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crafting Table Upload</h2>
+        
+        <form action="/cgi-bin/upload.cgi" method="post" enctype="multipart/form-data">
+            <div class="upload-section">
+                <label for="file-upload" class="upload-btn">
+                    📁 Dosya Seç
+                </label>
+                <input type="file" id="file-upload" name="file" hidden onchange="showFileInfo()">
+                
+                <div id="file-info" class="file-info">
+                    <span id="file-name">Dosya seçilmedi</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a href="/" class="button_2">🏠 Ana Sayfa</a>
+                <button type="submit">⬆️ Yükle</button>
+            </div>
+        </form>
+
+        <div id="messageBox" class="message"></div>
+    </div>
+
+    <script>
+        function showFileInfo() {
+            const fileInput = document.getElementById('file-upload');
+            const fileInfo = document.getElementById('file-info');
+            const fileName = document.getElementById('file-name');
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fileName.textContent = `Seçilen dosya: ${file.name} (${formatFileSize(file.size)})`;
+                fileInfo.style.display = 'block';
+            } else {
+                fileName.textContent = 'Dosya seçilmedi';
+                fileInfo.style.display = 'none';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showMessage(text, type) {
+            const box = document.getElementById('messageBox');
+            box.textContent = text;
+            box.className = 'message ' + type;
+            box.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

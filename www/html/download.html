@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya İndirme - Minecraft</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #42A5F5;
+            background-image:
+                /* Water theme */
+                linear-gradient(180deg, #42A5F5 0%, #2196F3 50%, #1976D2 100%),
+                /* Water ripple effect */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent 0px,
+                    transparent 8px,
+                    rgba(255,255,255,0.1) 8px,
+                    rgba(255,255,255,0.1) 16px
+                );
+            position: relative;
+            animation: waterFlow 20s linear infinite;
+        }
+
+        @keyframes waterFlow {
+            0% { background-position: 0px 0px, 0px 0px; }
+            100% { background-position: 32px 32px, -32px -32px; }
+        }
+
+        /* Floating elements */
+        body::before {
+            content: '📦';
+            position: fixed;
+            top: 20%;
+            left: 15%;
+            font-size: 32px;
+            animation: float 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '⬇️';
+            position: fixed;
+            bottom: 20%;
+            right: 15%;
+            font-size: 24px;
+            animation: float 6s ease-in-out infinite reverse;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            25% { transform: translateY(-20px) rotate(5deg); opacity: 1; }
+            50% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+            75% { transform: translateY(-10px) rotate(-3deg); opacity: 0.9; }
+        }
+
+        .container {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            padding: 40px;
+            border: 4px solid #654321;
+            border-radius: 12px;
+            box-shadow: 
+                0 0 0 2px #5D4037,
+                8px 8px 16px rgba(0,0,0,0.4),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            margin: 20px;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: linear-gradient(45deg, #3E2723, #5D4037);
+            z-index: -1;
+            border-radius: 16px;
+        }
+
+        h2 {
+            margin-bottom: 35px;
+            color: white;
+            font-size: 18px;
+            text-shadow: 3px 3px 0px #000;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        h2::before {
+            content: '💎';
+            margin-right: 15px;
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: white;
+            font-size: 14px;
+            text-shadow: 2px 2px 0px #000;
+            margin-bottom: 15px;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px;
+            border: 4px solid #37474F;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #F5F5F5, #E0E0E0);
+            font-size: 14px;
+            font-family: 'Press Start 2P', monospace;
+            box-shadow: 
+                inset 4px 4px 8px rgba(0,0,0,0.2),
+                0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 
+                inset 3px 3px 6px rgba(0,0,0,0.2), 
+                0 0 0 3px #2196F3,
+                0 4px 8px rgba(33, 150, 243, 0.3);
+            transform: translateY(-1px);
+        }
+
+        input[type="text"]::placeholder {
+            color: #666;
+            opacity: 0.7;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        button, .button_2 {
+            padding: 20px 30px;
+            font-size: 16px;
+            border: 4px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            text-shadow: 2px 2px 0px #000;
+            transition: all 0.2s;
+            font-family: 'Press Start 2P', monospace;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button::before,
+        .button_2::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            border-color: #1565C0;
+            box-shadow: 4px 4px 0px #0D47A1;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #42A5F5, #64B5F6);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #0D47A1;
+        }
+
+        .button_2 {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            border-color: #c62828;
+            box-shadow: 4px 4px 0px #b71c1c;
+        }
+
+        .button_2:hover {
+            background: linear-gradient(135deg, #ef5350, #e57373);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #b71c1c;
+        }
+
+        button:active, .button_2:active {
+            transform: translate(2px, 2px);
+        }
+
+        button:active {
+            box-shadow: 2px 2px 0px #0D47A1;
+        }
+
+        .button_2:active {
+            box-shadow: 2px 2px 0px #b71c1c;
+        }
+
+        .message {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            border: 3px solid;
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+
+        .success {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            border-color: #2E7D32;
+            box-shadow: 2px 2px 0px #1B5E20;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+            border-color: #c62828;
+            box-shadow: 2px 2px 0px #b71c1c;
+        }
+
+        /* Minecraft block pattern overlay */
+        .container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(0, 0, 0, 0.1) 16px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(0, 0, 0, 0.1) 16px
+                );
+            pointer-events: none;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                padding: 30px 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button, .button_2 {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Treasure Chest Download</h2>
+        
+        <div class="input-section">
+            <label for="_del">İndirmek istediğiniz dosya adı:</label>
+            <input type="text" id="_del" name="download_field" placeholder="Dosya adını girin" required>
+        </div>
+
+        <div class="button-group">
+            <a href="/" class="button_2">🏠 Ana Sayfa</a>
+            <button type="button" onclick="redirectPath()">⬇️ İndir</button>
+        </div>
+
+        <div id="messageBox" class="message"></div>
+    </div>
+
+    <script>
+        function showMessage(text, type) {
+            const box = document.getElementById('messageBox');
+            box.textContent = text;
+            box.className = 'message ' + type;
+            box.style.display = 'block';
+        }
+
+        function redirectPath() {
+            const input = document.getElementById("_del");
+            if (!input.value) {
+                showMessage("Lütfen bir dosya adı girin.", "error");
+                return;
+            }
+
+            let i = 0;
+            let counter = 0;
+            let slashIndex = 0;
+            let path = window.location.pathname;
+            while (path[i]) {
+                if (path[i] === '/')
+                    counter++;
+                if (counter === 3)
+                    slashIndex = i;
+                i++;
+            }
+            let rawPath = path.substr(0, slashIndex);
+            let last = rawPath.endsWith("/") ? rawPath : rawPath + "/";
+            let filePath = last + "uploads/" + input.value;
+
+            fetch(filePath, { method: 'GET' })
+                .then(response => {
+                    if (response.status === 200) {
+                        showMessage("İndirme başladı.", "success");
+                        window.location.href = filePath;
+                    } else if (response.status === 404) {
+                        showMessage("Hata: Dosya bulunamadı.", "error");
+                    } else {
+                        showMessage("Bilinmeyen bir hata oluştu.", "error");
+                    }
+                })
+                .catch(error => {
+                    showMessage("Sunucuya bağlanırken hata oluştu.", "error");
+                    console.error(error);
+                });
+        }
+    </script>
+</body>
+</html>
