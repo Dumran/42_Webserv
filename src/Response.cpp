@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Response.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:17:02 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:17:03 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <limits>
 #include <fstream>
 #include <sstream>
@@ -217,107 +229,6 @@ void Response::setCgiRoot(const std::string &cgiRoot)
     cgi_root = cgiRoot;
 }
 
-// void Response::configureFile(std::string file, Server &server)
-// {
-//     pure_link = file;
-//     // Kök dizin isteği için dosya yolunu doğrudan ayarla
-//     if (file.empty() || file == "/") {
-//         this->file = "./www/html/index.html";
-//         this->setResponseCode(HttpStatus::OK);
-//         return;
-//     }
-//     if (file.find('/') == std::string::npos)
-//     {
-//         this->file = file;
-//         return;
-//     }
-//     this->file = ".";
-//     std::vector<std::string> parts = StringUtils::split(file, '/');
-//     std::vector<std::string> united_parts;
-//     std::string united;
-
-//     for (std::vector<std::string>::size_type i = 0; i < parts.size(); ++i)
-//     {
-//         united += "/" + parts[i];
-//         united_parts.push_back(united);
-//     }
-//     if (parts.empty())
-//         united_parts.push_back("/");
-
-//     int matchedIndex = -1, locationIndex = -1;
-//     for (int i = (int)united_parts.size() - 1; i >= 0 && locationIndex == -1; --i)
-//     {
-//         for (size_t j = 0; j < server.getLocations().size(); ++j)
-//         {
-//             if (server.getLocations()[j].getPath() == united_parts[i])
-//             {
-//                 if (cgi_path.empty() && !server.getLocations()[j].getCgiPath().empty())
-//                 {
-//                     cgi_path = server.getLocations()[j].getCgiPath();
-//                     cgi_root = "." + server.getLocations()[j].getRoot();
-//                 }
-//                 if (cgi_extension.empty() && !server.getLocations()[j].getCgiExtension().empty())
-//                     cgi_extension = server.getLocations()[j].getCgiExtension();
-//                 locationIndex = j;
-//                 matchedIndex = i;
-//                 break;
-//             }
-//         }
-//     }
-
-//     if (locationIndex == -1 && server.getRootLocation() == -1 && server.getServerInRoot().empty())
-//     {
-//         response_code = HttpStatus::INTERNAL_SERVER_ERROR;
-//         return;
-//     }
-//     else if (locationIndex == -1 && server.getRootLocation() == -1 && !server.getServerInRoot().empty())
-//     {
-//         this->file += server.getServerInRoot();
-//         this->methods.push_back("GET");
-//         this->methods.push_back("POST");
-//         this->methods.push_back("DELETE");
-//     }
-//     else if (locationIndex != -1 || server.getRootLocation() != -1)
-//     {
-//         const Location &loc = (locationIndex == -1) ? server.getLocations()[server.getRootLocation()] : server.getLocations()[locationIndex];
-
-//         if (!loc.getRedirect().empty())
-//         {
-//             redirect = loc.getRedirect();
-//             this->setResponseCode(HttpStatus::FOUND);
-//             return;
-//         }
-//         if (!loc.getAddHeader().empty())
-//             add_header = loc.getAddHeader();
-
-//         if (!loc.getRoot().empty())
-//             this->file += loc.getRoot();
-//         else if (!server.getServerInRoot().empty())
-//             this->file += server.getServerInRoot();
-//         else
-//         {
-//             this->setResponseCode(HttpStatus::NOT_FOUND);
-//             return;
-//         }
-
-//         this->setAutoIndex(loc.getAutoIndex());
-//         this->setMethods(loc.getMethods());
-//     }
-//     if (request_type != NONE)
-//     {
-//         std::string methodName = HttpMethod::names[std::numeric_limits<int>::max() - static_cast<int>(request_type)];
-//         if (std::find(methods.begin(), methods.end(), methodName) != methods.end())
-//             this->setResponseCode(HttpStatus::OK);
-//         else
-//             this->setResponseCode(HttpStatus::METHOD_NOT_ALLOWED);
-//     }
-//     else
-//         this->setResponseCode(HttpStatus::METHOD_NOT_ALLOWED);
-//     for (size_t i = matchedIndex + 1; i < parts.size(); ++i)
-//         this->file += ((this->file[this->file.length() - 1] == '/') ? "" : "/") + parts[i];
-// }
-
-// Yardımcılar bu .cpp içinde "private" gibi davranması için static tutuldu.
 static bool is_root_request(const std::string &f) {
     return f.empty() || f == "/";
 }
@@ -376,11 +287,10 @@ static void find_location_match(const std::vector<std::string> &united_parts,
 static bool apply_location_config(Response *self,
                                   const Location &loc,
                                   const Server &server) {
-    // redirect varsa anında dön
     if (!loc.getRedirect().empty()) {
         self->setRedirect(loc.getRedirect());
         self->setResponseCode(HttpStatus::FOUND);
-        return true; // erken dönüş
+        return true;
     }
 
     if (!loc.getAddHeader().empty())
@@ -392,12 +302,12 @@ static bool apply_location_config(Response *self,
         self->setFile(self->getFile() + server.getServerInRoot());
     } else {
         self->setResponseCode(HttpStatus::NOT_FOUND);
-        return true; // kök belirlenemedi, 404
+        return true;
     }
 
     self->setAutoIndex(loc.getAutoIndex());
     self->setMethods(loc.getMethods());
-    return false; // normal akış
+    return false;
 }
 
 static void allow_default_methods(Response *self) {
@@ -432,61 +342,50 @@ static void append_remaining_segments(Response *self,
     self->setFile(currentFile);
 }
 
-// -------------------------------------------------------------
 
 void Response::configureFile(std::string file, Server &server)
 {
     pure_link = file;
 
-    // 1) Kök istek
     if (is_root_request(file)) {
         this->file = "./www/html/index.html";
         this->setResponseCode(HttpStatus::OK);
         return;
     }
 
-    // 2) Tek segment (slash yoksa) doğrudan dosya
     if (has_no_slash(file)) {
         this->file = file;
         return;
     }
 
-    // 3) Parçaları hazırla
     this->file = ".";
     std::vector<std::string> parts = StringUtils::split(file, '/');
     std::vector<std::string> united_parts;
     accumulate_parts(parts, united_parts);
 
-    // 4) En iyi eşleşen location'ı bul
     int matchedIndex, locationIndex;
     find_location_match(united_parts, server, matchedIndex, locationIndex,
                         cgi_path, cgi_root, cgi_extension);
 
-    // 5) Location bulunamazsa ve server kökü de yoksa -> 500
     if (locationIndex == -1 && server.getRootLocation() == -1 && server.getServerInRoot().empty()) {
         response_code = HttpStatus::INTERNAL_SERVER_ERROR;
         return;
     }
-    // 6) Location yok fakat server root varsa onu kullan, default metodları aç
     else if (locationIndex == -1 && server.getRootLocation() == -1 && !server.getServerInRoot().empty()) {
         this->file += server.getServerInRoot();
         allow_default_methods(this);
     }
-    // 7) Location bulundu veya rootLocation tanımlı
     else if (locationIndex != -1 || server.getRootLocation() != -1) {
         const Location &loc = (locationIndex == -1)
                                 ? server.getLocations()[server.getRootLocation()]
                                 : server.getLocations()[locationIndex];
 
-        // Location ayarlarını uygula (redirect varsa erken dön)
         if (apply_location_config(this, loc, server))
             return;
     }
 
-    // 8) Metoda göre durum kodu belirle
     decide_status_by_method(this);
 
-    // 9) Kalan path segmentlerini ekle
     append_remaining_segments(this, parts, matchedIndex);
 }
 

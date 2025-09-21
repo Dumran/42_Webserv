@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   WebServer.cpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:17:43 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:17:44 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstdlib>
@@ -44,107 +56,6 @@ int WebServer::socketCreator(Server &server)
     return (socket(server.res->ai_family, server.res->ai_socktype, server.res->ai_protocol));
 }
 
-// void WebServer::cgiHandle(Client &client)
-// {
-//     extern char **environ;
-//     int fd_out[2];
-//     int fd_in[2];
-//     if (pipe(fd_out) == -1 || pipe(fd_in) == -1)
-//         return;
-//     int pid = fork();
-//     if (pid < 0)
-//     {
-//         close(fd_out[0]);
-//         close(fd_out[1]);
-//         close(fd_in[0]);
-//         close(fd_in[1]);
-//         return;
-//     }
-//     int req = static_cast<int>(client.getResponse().getRequestType());
-//     if (pid == 0)
-//     {
-//         const std::string &cgi_root = client.getResponse().getCgiRoot();
-
-//         chdir(cgi_root.c_str());
-//         if (req == HttpMethod::POST || req == HttpMethod::DELETE)
-//         {
-//             setenv("CONTENT_TYPE", client.getResponse().getContentType().c_str(), 1);
-//             setenv("CONTENT_LENGTH", StringUtils::from(client.getResponse().getContentLength()).c_str(), 1);
-//         }
-//         setenv("REQUEST_METHOD", HttpMethod::names[INT_MAX - req].c_str(), 1);
-//         close(fd_out[0]);
-//         dup2(fd_out[1], 1);
-//         close(fd_out[1]);
-
-//         close(fd_in[1]);
-//         dup2(fd_in[0], 0);
-//         close(fd_in[0]);
-
-//         std::string file = client.getResponse().getFile().substr(cgi_root.length() + 1);
-//         std::string cgiPath = client.getResponse().getCgiPath();
-//         const char *argv[] = {cgiPath.c_str(), "-Wignore", file.c_str(), NULL};
-//         execve(argv[0], const_cast<char *const *>(argv), environ);
-//         exit(1);
-//     }
-
-//     close(fd_out[1]);
-//     close(fd_in[0]);
-
-//     bool errorHandle = false;
-//     if (req == HttpMethod::POST || req == HttpMethod::DELETE)
-//     {
-//         const std::string &data = client.getResponse().getFormData();
-//         if (data.empty())
-//         {
-//             client.getResponse().setResponseCode(HttpStatus::BAD_REQUEST);
-//             errorHandle = true;
-//         }
-//         else if (write(fd_in[1], data.c_str(), data.size()) < 0)
-//         {
-//             client.getResponse().setResponseCode(HttpStatus::INTERNAL_SERVER_ERROR);
-//             errorHandle = true;
-//         }
-//     }
-
-//     close(fd_in[1]);
-
-//     if (!errorHandle)
-//     {
-//         if (!Utils::wait(pid, 2))
-//         {
-//             client.getResponse().setResponseCode(HttpStatus::REQUEST_TIMEOUT);
-//             errorHandle = true;
-//         }
-//     }
-//     std::string output;
-//     if (!errorHandle)
-//     {
-//         char buffer[10240];
-//         int n;
-//         while ((n = read(fd_out[0], buffer, sizeof(buffer))) > 0)
-//             output.append(buffer, n);
-//         if (n < 0)
-//         {
-//             client.getResponse().setResponseCode(HttpStatus::INTERNAL_SERVER_ERROR);
-//             errorHandle = true;
-//         }
-//     }
-
-//     close(fd_out[0]);
-
-//     if (!errorHandle)
-//     {
-//         client.getResponse().setContent(output);
-//     }
-//     else
-//     {
-//         client.getResponse().setContent(Utils::resToErrorPages(client.getResponse(), client.getResponse().getResponseCode(), client));
-//     }
-//     client.setWriteBuffer(Utils::getResponseHeader(client));
-// }
-
-// ---- Yardımcılar ----
-
 static bool make_pipes(int fd_out[2], int fd_in[2]) {
     if (::pipe(fd_out) == -1) return false;
     if (::pipe(fd_in)  == -1) {
@@ -170,7 +81,6 @@ static void setup_child_stdio(int fd_out[2], int fd_in[2]) {
 }
 
 static void apply_cgi_env(const Client &client, int req) {
-    // Not: Orijinal akıştaki env ayarları birebir korunur.
     if (req == HttpMethod::POST || req == HttpMethod::DELETE) {
         ::setenv("CONTENT_TYPE",  client.getResponse().getContentType().c_str(), 1);
         ::setenv("CONTENT_LENGTH", StringUtils::from(client.getResponse().getContentLength()).c_str(), 1);
@@ -242,7 +152,6 @@ static void finalize_cgi_response(Client &client, const std::string &output, boo
     client.setWriteBuffer(Utils::getResponseHeader(client));
 }
 
-// ---- Asıl fonksiyon ----
 
 void WebServer::cgiHandle(Client &client)
 {
@@ -263,10 +172,8 @@ void WebServer::cgiHandle(Client &client)
 
     if (pid == 0) {
         exec_cgi_child(client, req, fd_out, fd_in);
-        // ulaşılmaz
     }
 
-    // Ebeveyn
     ::close(fd_out[1]);
     ::close(fd_in[0]);
 
@@ -479,58 +386,6 @@ void WebServer::clientSend(int i)
     }
 }
 
-// void WebServer::start()
-// {
-//     Log::info("Server is running.");
-//     while (true)
-//     {
-//         int events = poll(poll_fds.data(), poll_fds.size(), -1);
-//         if (events < 0)
-//             throw ServerExcp("Poll Error");
-
-//         for (int i = poll_fds.size() - 1; i >= 0; i--)
-//         {
-//             short re = poll_fds[i].revents;
-//             Client &client = clients[i];
-
-//             if (re & (POLLHUP | POLLERR))
-//             {
-//                 closeClient(i);
-//                 continue;
-//             }
-
-//             if (i < server_size && (re & POLLIN))
-//             {
-//                 newConnection(i);
-//                 continue;
-//             }
-
-//             if (i > 0 && (re & POLLIN))
-//             {
-//                 if (client.getEvents() == WAIT_FORM)
-//                 {
-//                     readFormData(i);
-//                     if (client.getResponse().getResponseCode() == HttpStatus::PAYLOAD_TOO_LARGE)
-//                         continue;
-//                 }
-//                 else
-//                 {
-//                     serverResponse(client);
-//                     if (client.getEvents() == EXITED)
-//                         continue;
-//                 }
-//                 if (!client.getWriteBuffer().empty() && client.getEvents() != WAIT_FORM)
-//                     poll_fds[i].events |= POLLOUT;
-//             }
-
-//             if (i > 0 && (re & POLLOUT) && client.getEvents() != WAIT_FORM && !client.getWriteBuffer().empty())
-//                 clientSend(i);
-//         }
-//     }
-// }
-
-// --- WebServer yardımcıları ---
-
 int WebServer::wait_for_events()
 {
     if (poll_fds.empty()) return 0;
@@ -605,14 +460,12 @@ void WebServer::process_fd(int i)
     if (is_client_index(i) && can_read(re))
     {
         handle_client_readable(i, client);
-        // burada yazılabilirlik aynı poll döngüsünde re'ye göre kontrol edilecek
     }
 
     if (is_client_index(i))
         handle_client_writable(i, client, re);
 }
 
-// --- Parçalanmış start() ---
 
 void WebServer::start()
 {

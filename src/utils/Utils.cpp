@@ -1,8 +1,30 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Utils.cpp                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:24:19 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:24:20 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "utils/Utils.hpp"
 #include <sstream>
 #include "Client.hpp"
+#include <fstream>
+#include <string>
+#include <iostream>
+#include <cstdio>
+#include <dirent.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <ctime>
+#include <signal.h>
+#include "Response.hpp"
+#include "utils/ResponseUtils.hpp"
 
-// Eksik chunked fonksiyonları
 std::string Utils::chunkedGetLine(std::istringstream &src, int size) {
     std::string line;
     if (size == 0)
@@ -20,12 +42,8 @@ std::string Utils::chunkedGetLine(std::istringstream &src, int size) {
 void chunkedCompleted(Client &client, const std::string &aggregate) {
     (void)client;
     (void)aggregate;
-    // Chunked işlemi tamamlandığında yapılacaklar buraya eklenebilir
 }
-// Eksik fonksiyonların basit gövdeleri
-#include <fstream>
-#include <sstream>
-#include "Client.hpp"
+
 bool readFileToString(const std::string &path, std::string &out) {
     std::ifstream file(path.c_str());
     if (!file.is_open()) return false;
@@ -40,26 +58,11 @@ std::string generateAutoIndex(const std::string &dirPath, const std::string &req
     (void)client;
     return "<html><body><h1>AutoIndex for " + dirPath + "</h1></body></html>";
 }
-#include <string>
-#include "Client.hpp"
 
-// Fonksiyon prototipleri
+
 bool readFileToString(const std::string &path, std::string &out);
 std::string generateAutoIndex(const std::string &dirPath, const std::string &requestPath, const Client &client);
-#include "utils/Utils.hpp"
-#include <iostream>
-#include <cstdio>
-#include <dirent.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <fstream>
-#include <sstream>
-#include <ctime>
-#include <signal.h>
-#include <string>
-#include "Response.hpp"
-#include "Client.hpp"
-#include "utils/ResponseUtils.hpp"
+
 
 bool Utils::wait(pid_t pid, int timeout_seconds)
 {
@@ -89,69 +92,6 @@ std::string Utils::getTime()
     return (std::string(buffer));
 }
 
-// std::string Utils::readFile(const std::string &fileName, Response &response, Client &client, int code)
-// {
-//     int respCode = response.getResponseCode();
-//     if (respCode != 0 && respCode != 200 && respCode != -1)
-//         return Utils::resToErrorPages(response, respCode, client);
-
-//     struct stat st;
-//     if (stat(fileName.c_str(), &st) == 0 && S_ISDIR(st.st_mode))
-//     {
-//         const std::string &pureLink = response.getPureLink();
-//         if (pureLink.empty() || pureLink[pureLink.size() - 1] != '/')
-//             return Utils::resToErrorPages(response, HttpStatus::MOVED_PERMANENTLY, client);
-
-//         std::string indexPath = fileName + "/index.html";
-//         if (access(indexPath.c_str(), R_OK) == 0)
-//         {
-//             std::string body;
-//             if (readFileToString(indexPath, body))
-//             {
-//                 response.setResponseCode(code);
-//                 return body;
-//             }
-//         }
-//         if (response.getAutoIndex())
-//         {
-//             return generateAutoIndex(fileName, client.getResponse().getFile(), client);
-//         }
-//         return Utils::resToErrorPages(response, HttpStatus::FORBIDDEN, client);
-//     }
-//     const Server &srv = client.getServer();
-
-//     if (!client.getResponse().getCgiPath().empty() && !srv.getCgiExtensionInServer().empty())
-//     {
-//         if (access(srv.getCgiPathInServer().c_str(), X_OK) != 0 || access(fileName.c_str(), F_OK) != 0 || access(fileName.c_str(), R_OK) != 0)
-//         {
-//             if (access(fileName.c_str(), R_OK) != 0)
-//                 return Utils::resToErrorPages(response, HttpStatus::INTERNAL_SERVER_ERROR, client);
-//             return Utils::resToErrorPages(
-//                 response,
-//                 access(srv.getCgiPathInServer().c_str(), X_OK) != 0
-//                     ? HttpStatus::INTERNAL_SERVER_ERROR
-//                     : HttpStatus::NOT_FOUND,
-//                 client);
-//         }
-//         if (access(fileName.c_str(), X_OK) != 0)
-//             return Utils::resToErrorPages(response, HttpStatus::INTERNAL_SERVER_ERROR, client);
-
-//         if (fileName.find(srv.getCgiExtensionInServer()) == std::string::npos)
-//             return Utils::resToErrorPages(response, HttpStatus::INTERNAL_SERVER_ERROR, client);
-//         response.setIsCgi(true);
-//         return "";
-//     }
-//     std::string body;
-//     if (readFileToString(fileName, body))
-//     {
-//         response.setResponseCode(code);
-//         return body;
-//     }
-//     return Utils::resToErrorPages(response, HttpStatus::NOT_FOUND, client);
-// }
-
-// ---- Yardımcılar (aynı .cpp içinde static tutabilirsiniz) ----
-
 static bool has_predetermined_response(const Response &resp) {
     const int c = resp.getResponseCode();
     return (c != 0 && c != 200 && c != -1);
@@ -161,7 +101,6 @@ static bool is_directory(const std::string &path, struct stat &st) {
     return (::stat(path.c_str(), &st) == 0) && S_ISDIR(st.st_mode);
 }
 
-// Dizine girildiğinde orijinal akış: trailing slash kontrolü, index.html, autoindex, aksi FORBIDDEN
 static std::string serve_directory_case(const std::string &dirPath,
                                         Response &response,
                                         Client &client,
@@ -169,11 +108,9 @@ static std::string serve_directory_case(const std::string &dirPath,
 {
     const std::string &pureLink = response.getPureLink();
 
-    // trailing slash yoksa 301
     if (pureLink.empty() || pureLink[pureLink.size() - 1] != '/')
         return Utils::resToErrorPages(response, HttpStatus::MOVED_PERMANENTLY, client);
 
-    // index.html varsa onu oku
     const std::string indexPath = dirPath + "/index.html";
     if (::access(indexPath.c_str(), R_OK) == 0)
     {
@@ -183,14 +120,11 @@ static std::string serve_directory_case(const std::string &dirPath,
             response.setResponseCode(code);
             return body;
         }
-        // okuma başarısız ise, autoindex/forbidden akışına düşer
     }
 
-    // autoindex açıksa liste üret
     if (response.getAutoIndex())
         return generateAutoIndex(dirPath, client.getResponse().getFile(), client);
 
-    // aksi halde erişim yasak
     return Utils::resToErrorPages(response, HttpStatus::FORBIDDEN, client);
 }
 
@@ -198,13 +132,11 @@ static bool should_try_cgi(const Response &resp, const Server &srv) {
     return (!resp.getCgiPath().empty() && !srv.getCgiExtensionInServer().empty());
 }
 
-// CGI çalıştırma önkoşulları ve karar mantığı (orijinalle birebir)
 static std::string handle_cgi_case(Response &response,
                                    Client &client,
                                    const std::string &fileName,
                                    const Server &srv)
 {
-    // cgi binary çalıştırılabilir mi, dosya mevcut ve okunabilir mi?
     if (::access(srv.getCgiPathInServer().c_str(), X_OK) != 0 ||
         ::access(fileName.c_str(), F_OK) != 0 ||
         ::access(fileName.c_str(), R_OK) != 0)
@@ -220,15 +152,12 @@ static std::string handle_cgi_case(Response &response,
             client);
     }
 
-    // script dosyasının da çalıştırılabilir olması bekleniyor
     if (::access(fileName.c_str(), X_OK) != 0)
         return Utils::resToErrorPages(response, HttpStatus::INTERNAL_SERVER_ERROR, client);
 
-    // uzantı eşleşmesi (orijinal: substring arama)
     if (fileName.find(srv.getCgiExtensionInServer()) == std::string::npos)
         return Utils::resToErrorPages(response, HttpStatus::INTERNAL_SERVER_ERROR, client);
 
-    // CGI akışına geçileceğini işaretle ve gövdeyi daha sonra üret
     response.setIsCgi(true);
     return std::string();
 }
@@ -247,28 +176,23 @@ static std::string serve_static_file(const std::string &fileName,
     return Utils::resToErrorPages(response, HttpStatus::NOT_FOUND, client);
 }
 
-// ---- Asıl fonksiyon (koordinasyon) ----
 
 std::string Utils::readFile(const std::string &fileName, Response &response, Client &client, int code)
 {
-    // Önceden belirlenmiş bir hata kodu varsa doğrudan onun sayfasını dön
     if (has_predetermined_response(response))
         return Utils::resToErrorPages(response, response.getResponseCode(), client);
 
-    // Dizin mi?
     struct stat st;
     if (is_directory(fileName, st))
         return serve_directory_case(fileName, response, client, code);
 
-    // CGI mi denenmeli?
     const Server &srv = client.getServer();
     if (should_try_cgi(client.getResponse(), srv))
     {
         std::string cgi_result = handle_cgi_case(response, client, fileName, srv);
-        return cgi_result; // "" olabilir (CGI akışı için), ya da hata sayfası/gövde
+        return cgi_result;
     }
 
-    // Düz dosya oku
     return serve_static_file(fileName, response, client, code);
 }
 
@@ -365,55 +289,11 @@ void Utils::getServerByHost(const std::string &host, Client &client)
     client.setMaxBodySize(client.getConfig().getDefault().getClientMaxBodySize());
 }
 
-// void Utils::parseChunked(Client &client, std::string &body)
-// {
-//     std::istringstream tempBody(body);
-//     std::string result;
-//     std::string line;
-//     int size = 0;
-//     std::string temp;
-
-//     line = chunkedGetLine(tempBody, 0);
-//     while (!line.empty())
-//     {
-//         size = 0;
-//         std::istringstream hexStream(line);
-//         hexStream >> std::hex >> size;
-//         if (size == 0)
-//         {
-//             size = -1;
-//             break;
-//         }
-//         std::string temp;
-//         while (temp.length() != (size_t)size)
-//         {
-//             line = chunkedGetLine(tempBody, size);
-//             temp.append(line);
-//         }
-//         result.append(temp);
-//         line = chunkedGetLine(tempBody, 2);
-//         line = chunkedGetLine(tempBody, 0);
-//     }
-
-//     if (size == -1)
-//     {
-//         if (result.length() > client.getMaxBodySize())
-//         {
-//             client.getResponse().setContent(Utils::resToErrorPages(client.getResponse(), HttpStatus::PAYLOAD_TOO_LARGE, client));
-//             return;
-//         }
-//         chunkedCompleted(client, result);
-//     }
-// }
-
-// ---- Yardımcılar (aynı .cpp içinde static tutabilirsiniz) ----
-
-
 static int parse_hex_chunk_size(const std::string &line) {
     int sz = 0;
     std::istringstream hexStream(line);
     hexStream >> std::hex >> sz;
-    return sz; // 0 olabilir (son)
+    return sz;
 }
 
 static void read_exact_chunk(std::istringstream &src, int size, std::string &chunk_out) {
@@ -437,7 +317,6 @@ static bool finalize_chunking(Client &client, const std::string &aggregate) {
     return true;
 }
 
-// ---- Asıl fonksiyon (koordine eder) ----
 
 void Utils::parseChunked(Client &client, std::string &body)
 {
@@ -445,10 +324,9 @@ void Utils::parseChunked(Client &client, std::string &body)
     std::string result;
     std::string line;
 
-    // İlk boyut satırını al
     line = chunkedGetLine(tempBody, 0);
 
-    int size_flag = 0; // -1 => son chunk görüldü
+    int size_flag = 0;
     while (!line.empty())
     {
         int size = parse_hex_chunk_size(line);
@@ -458,7 +336,6 @@ void Utils::parseChunked(Client &client, std::string &body)
         read_exact_chunk(tempBody, size, chunk);
         result.append(chunk);
 
-        // CRLF tüket ve yeni boyut satırına geç
         line = chunkedGetLine(tempBody, 2);
         line = chunkedGetLine(tempBody, 0);
     }
@@ -466,78 +343,6 @@ void Utils::parseChunked(Client &client, std::string &body)
     if (size_flag == -1)
         (void)finalize_chunking(client, result);
 }
-
-
-// std::string Utils::chunkedGetLine(std::istringstream &stream, int type)
-// {
-//     std::string temp;
-
-//     char *buffer = new char[100240];
-//     if (type == 0)
-//     {
-//         while (temp.find("\r\n") == std::string::npos && !stream.eof())
-//         {
-//             stream.read(buffer, 1);
-//             temp.append(buffer, 1);
-//         }
-//     }
-//     else
-//     {
-//         stream.read(buffer, type);
-//         temp.append(buffer, type);
-//     }
-//     delete[] buffer;
-//     return (temp);
-// }
-
-// void Utils::chunkedCompleted(Client &client, std::string &result)
-// {
-//     std::string key = client.getResponse().getContentType();
-//     size_t firstPos = key.find("=");
-
-//     client.setFormData(result);
-//     client.getResponse().setContentLength(result.length());
-//     client.getResponse().setFormData(result);
-//     client.getResponse().setIsChunked(false);
-//     if (firstPos == std::string::npos)
-//         return;
-
-//     std::string separator = key.substr(firstPos + 1);
-//     if (countSeparator(result, separator) > 1)
-//     {
-//         size_t firstIndex = result.find(separator, result.find(separator) + 1);
-//         if (firstIndex != std::string::npos)
-//         {
-//             std::string temp = result.substr(firstIndex - 2);
-//             if (temp.length() == client.getResponse().getContentLength())
-//                 client.getResponse().setFormData(temp);
-//             else
-//                 client.getFormData().append(temp);
-//         }
-//     }
-// }
-
-// std::string Utils::resToErrorPages(Response &response, int error_type, Client &client)
-// {
-//     Server &server = client.getServer();
-//     std::string file = "";
-//     std::map<int, std::string>::iterator it = server.getErrorPages().find(error_type);
-
-//     response.setResponseCode(error_type);
-//     if (it != server.getErrorPages().end())
-//         file = "." + it->second;
-
-//     std::ifstream nf(file.c_str());
-//     std::stringstream buffer;
-//     if (nf)
-//     {
-//         buffer << nf.rdbuf();
-//         return buffer.str();
-//     }
-//     return response.getResponseCodeStr();
-// }
-
-// ---- Yardımcılar (aynı .cpp içinde static tutabilirsiniz) ----
 
 static std::string resolve_error_file(Server &server, int error_type)
 {
@@ -558,7 +363,6 @@ static bool read_whole_file_to_string(const std::string &path, std::string &out)
     return true;
 }
 
-// ------------------------------------------------------------
 
 std::string Utils::resToErrorPages(Response &response, int error_type, Client &client)
 {
@@ -581,8 +385,6 @@ std::string Utils::getResponseHeader(Client &client)
     std::ostringstream statusLine;
     statusLine << "HTTP/1.1 " << responseCode << " " << HttpStatus::to_string(responseCode) << "\r\n";
     std::string header = statusLine.str();
-    // Yanıtın ilk 32 byte'ını hex olarak logla
-    // Her zaman Content-Type: text/html ekle
     header += "Content-Type: text/html\r\n";
     if (responseCode == HttpStatus::METHOD_NOT_ALLOWED)
     {
@@ -702,74 +504,28 @@ void Utils::parseChunkedFt(Client &client, std::string &body, int type)
     }
 }
 
-// std::string Utils::generateAutoIndex(const std::string &path, const std::string &requestPath, Client &client)
-// {
-//     DIR *dir;
-//     struct dirent *entry;
-//     struct stat info;
-//     std::ostringstream html;
-
-//     html << "<html><head><title>Index of " << requestPath << "</title></head>\n";
-//     html << "<body><h1>Index of " << requestPath << "</h1><ul>\n";
-
-//     dir = opendir(path.c_str());
-//     if (!dir)
-//     {
-//         html << "<p>Failed to open directory</p></body></html>";
-//         return html.str();
-//     }
-
-//     while ((entry = readdir(dir)) != NULL)
-//     {
-//         std::string name = entry->d_name;
-
-//         if (name == "." || name == "..")
-//             continue;
-
-//         std::string fullPath = path + "/" + name;
-
-//         if (stat(fullPath.c_str(), &info) == 0 && S_ISDIR(info.st_mode))
-//         {
-//             name += "/";
-//         }
-
-//         html << "<li><a href=\"" << client.getResponse().getPureLink() + name << "\">" << name << "</a></li>\n";
-//     }
-
-//     closedir(dir);
-
-//     html << "</ul></body></html>";
-//     return html.str();
-// }
-
 std::string Utils::generateAutoIndex(const std::string &path,
                                      const std::string &requestPath,
                                      Client &client)
 {
-    // Çıktıyı parça parça biriktireceğiz
     std::string html;
     html.reserve(1024);
 
-    // Başlık ve açılışlar (orijinal akışa sadık: önce yaz, sonra opendir dene)
     html.append("<html><head><title>Index of ");
     html.append(requestPath);
     html.append("</title></head>\n<body><h1>Index of ");
     html.append(requestPath);
     html.append("</h1><ul>\n");
 
-    // Dizin açma
     DIR *d = opendir(path.c_str());
     if (!d)
     {
-        // Orijinal davranış: <ul> zaten yazılmışken burada hata basıp kapat
         html.append("<p>Failed to open directory</p></body></html>");
         return html;
     }
 
-    // Taban linki bir kere al
     const std::string base = client.getResponse().getPureLink();
 
-    // readdir döngüsü (C++98)
     for (;;)
     {
         struct dirent *ent = readdir(d);
@@ -778,32 +534,26 @@ std::string Utils::generateAutoIndex(const std::string &path,
         const char *raw = ent->d_name;
         if (!raw) continue;
 
-        // "." veya ".." atla (string oluşturmadan hızlı kontrol)
         if (raw[0] == '.')
         {
-            // "." veya ".." kontrolü
             if (raw[1] == '\0') continue;
             if (raw[1] == '.' && raw[2] == '\0') continue;
         }
 
-        // İsim string'i
         std::string entryName(raw);
 
-        // Tam yol: path + "/" + name
         std::string absolute;
         absolute.reserve(path.size() + 1 + entryName.size());
         absolute.append(path);
         absolute.append("/");
         absolute.append(entryName);
 
-        // Dizinse sonuna "/" ekle (hem görünen adda hem href'te)
         struct stat st;
         if (::stat(absolute.c_str(), &st) == 0 && S_ISDIR(st.st_mode))
         {
             entryName.append("/");
         }
 
-        // <li><a href="...">...</a></li>
         html.append("<li><a href=\"");
         html.append(base);
         html.append(entryName);

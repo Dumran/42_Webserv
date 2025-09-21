@@ -1,8 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Config.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:20:18 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:20:19 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "conf/Config.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <vector>
+#include <string>
+#include <sys/stat.h>
 
 Config::Config()
 {
@@ -77,53 +92,10 @@ bool Config::validate_ip(const std::string& ip)
     return count == 4;
 }
 
-// bool Config::check_braces(const std::string& filename)
-// {
-//     std::ifstream file(filename.c_str());
-//     std::string tab_line;
-//     int open_braces = 0;  
-//     int close_braces = 0;
-
-//     if (!file.is_open())
-//     {
-//         std::cerr << "webserv: could not open configuration file \"" << filename << "\": No such file or directory" << std::endl;
-//         return false;
-//     }
-
-//     while (std::getline(file, tab_line))
-//     {
-//         std::string line = trim_space(tab_line);
-//         if (line.empty() || line[0] == '#')
-//             continue;
-//         for (std::string::size_type i = 0; i < line.length(); ++i)
-//         {
-//             if (line[i] == '{')
-//                 open_braces++;
-//             else if (line[i] == '}')
-//                 close_braces++;
-//         }
-//     }
-
-//     file.close();
-
-//     if (open_braces != close_braces)
-//     {
-//         std::cerr << "webserv: mismatched braces in " << filename << ": " 
-//                   << open_braces << " opening braces, " << close_braces << " closing braces" << std::endl;
-//         return false;
-//     }
-
-//     return true;
-// }
-
-// Yardımcılar (aynı .cpp içinde static tutabilirsiniz)
-
-// Trim sonrası boş veya yorum satırı mı?
 static bool is_ignorable_line(const std::string &line) {
     return line.empty() || line[0] == '#';
 }
 
-// Tek bir satırdaki süslü parantezleri say
 static void accumulate_braces_from_line(const std::string &line,
                                         int &opens,
                                         int &closes)
@@ -134,7 +106,6 @@ static void accumulate_braces_from_line(const std::string &line,
     }
 }
 
-// Dosya satırlarını gezip parantez sayılarını biriktir
 static void scan_file_for_braces(std::ifstream &file,
                                  int &opens,
                                  int &closes)
@@ -147,7 +118,6 @@ static void scan_file_for_braces(std::ifstream &file,
     }
 }
 
-// Mismatch durumunu raporla (mesaj metni birebir aynı)
 static bool report_mismatch_and_fail(const std::string &filename,
                                      int opens,
                                      int closes)
@@ -157,7 +127,6 @@ static bool report_mismatch_and_fail(const std::string &filename,
     return false;
 }
 
-// ------------------------------------------------------------
 
 bool Config::check_braces(const std::string& filename)
 {
@@ -183,13 +152,7 @@ bool Config::check_braces(const std::string& filename)
 
 
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
-#include <cstdlib>  // strtoul
-#include <sys/stat.h>
+
 
 static bool fail_and_clear(std::ifstream &file,
                            std::vector<Server> &servers)
@@ -220,9 +183,9 @@ static bool start_server_block_if_needed(const std::string &line,
         current_server.setHost("");
         current_server.setClientMaxBodySize(1024 * 1024);
         current_server.setRootLocation(-1);
-        return true; // matched
+        return true;
     }
-    return false; // not a server start
+    return false;
 }
 
 static bool end_server_block_if_needed(const std::string &line,
@@ -239,8 +202,8 @@ static bool end_server_block_if_needed(const std::string &line,
         set_server_defaults(current_server);
         in_server_block = false;
         servers.push_back(current_server);
-        (void)filename; (void)line_number; // sessizlik, orijinalde mesaj yok
-        return true; // matched & handled
+        (void)filename; (void)line_number;
+        return true;
     }
     return false;
 }
@@ -280,7 +243,7 @@ static bool start_location_block_if_needed(const std::string &line,
     current_location.setPath(Config::trim_space(path));
         current_location.setAutoIndex(false);
         current_location.setUploadLimit(0);
-        return true; // matched & handled
+        return true;
     }
     return false;
 }
@@ -367,75 +330,6 @@ static bool parse_server_name(std::stringstream &ss,
     return true;
 }
 
-// static bool parse_client_max_body_size(std::stringstream &ss,
-//                                        const std::string &filename,
-//                                        int line_number,
-//                                        std::ifstream &file,
-//                                        std::vector<Server> &servers,
-//                                        Server &current_server)
-// {
-//     std::string size;
-//     ss >> std::ws;
-//     std::getline(ss, size, ';');
-
-//     size_t first = size.find_first_not_of(" \t");
-//     size_t last  = size.find_last_not_of(" \t");
-//     if (first != std::string::npos && last != std::string::npos)
-//         size = size.substr(first, last - first + 1);
-//     else
-//         size.clear();
-
-//     if (size.empty())
-//     {
-//         std::cerr << "webserv: invalid value \"\" in \"client_max_body_size\" directive in "
-//                   << filename << ":" << line_number << std::endl;
-//         return fail_and_clear(file, servers);
-//     }
-
-//     unsigned long value = 0;
-//     char* endptr = 0;
-//     std::string original_size = size;
-//     char lastch = size[size.length() - 1];
-
-//     if (lastch == 'M' || lastch == 'm')
-//     {
-//         size.erase(size.length() - 1);
-//         value = std::strtoul(size.c_str(), &endptr, 10);
-//         if (endptr != size.c_str() && *endptr == '\0' && value > 0)
-//             value *= 1024UL * 1024UL;
-//     }
-//     else if (lastch == 'K' || lastch == 'k')
-//     {
-//         size.erase(size.length() - 1);
-//         value = std::strtoul(size.c_str(), &endptr, 10);
-//         if (endptr != size.c_str() && *endptr == '\0' && value > 0)
-//             value *= 1024UL;
-//     }
-//     else if (lastch == 'G' || lastch == 'g')
-//     {
-//         size.erase(size.length() - 1);
-//         value = std::strtoul(size.c_str(), &endptr, 10);
-//         if (endptr != size.c_str() && *endptr == '\0' && value > 0)
-//             value *= 1024UL * 1024UL * 1024UL;
-//     }
-//     else
-//     {
-//         value = std::strtoul(size.c_str(), &endptr, 10);
-//     }
-
-//     if (endptr == size.c_str() || *endptr != '\0' || value == 0)
-//     {
-//         std::cerr << "webserv: invalid value \"" << original_size << "\" in \"client_max_body_size\" directive in "
-//                   << filename << ":" << line_number << std::endl;
-//         return fail_and_clear(file, servers);
-//     }
-
-//     current_server.setClientMaxBodySize(value);
-//     return true;
-// }
-
-// ---- Yardımcılar ----
-
 static void read_size_token(std::stringstream &ss, std::string &size_out) {
     ss >> std::ws;
     std::getline(ss, size_out, ';');
@@ -452,7 +346,7 @@ static void trim_token_inplace(std::string &s) {
 
 static bool parse_numeric(std::string &num_str, unsigned long &value, char* &endptr) {
     value = std::strtoul(num_str.c_str(), &endptr, 10);
-    return true; // başarı/başarısızlık endptr üzerinden değerlendirilecek
+    return true;
 }
 
 static void apply_unit_multiplier(char unit, unsigned long &value) {
@@ -465,28 +359,23 @@ static bool convert_size_to_bytes(std::string &size_trimmed,
                                   unsigned long &value,
                                   char* &endptr)
 {
-    // Sonekli (K/M/G) ya da düz sayı olabilir; orijinal mantık korunuyor.
     const char lastch = size_trimmed[size_trimmed.length() - 1];
 
     if (lastch == 'K' || lastch == 'k' ||
         lastch == 'M' || lastch == 'm' ||
         lastch == 'G' || lastch == 'g')
     {
-        // Orijinal: önce soneki silip parse et
         size_trimmed.erase(size_trimmed.length() - 1);
         parse_numeric(size_trimmed, value, endptr);
-        // Geçerliyse çarp; aksi halde final kontrolde hata vereceğiz
         if (endptr != size_trimmed.c_str() && *endptr == '\0' && value > 0)
             apply_unit_multiplier(lastch, value);
         return true;
     }
 
-    // Düz sayı
     parse_numeric(size_trimmed, value, endptr);
     return true;
 }
 
-// ---- Asıl fonksiyon ----
 
 static bool parse_client_max_body_size(std::stringstream &ss,
                                        const std::string &filename,
@@ -512,7 +401,6 @@ static bool parse_client_max_body_size(std::stringstream &ss,
 
     convert_size_to_bytes(size, value, endptr);
 
-    // Orijinal doğrulama koşulu birebir korunuyor
     if (endptr == size.c_str() || *endptr != '\0' || value == 0)
     {
         std::cerr << "webserv: invalid value \"" << original_size << "\" in \"client_max_body_size\" directive in "
@@ -734,7 +622,6 @@ static bool validate_allowed_methods(const std::vector<Server> &servers,
                                      std::ifstream &file,
                                      std::vector<Server> &mutable_servers)
 {
-    // Aynı hata akışı ve mesajlar korunuyor
     for (size_t i = 0; i < servers.size(); i++)
     {
         const std::vector<Location> &locs = servers[i].getLocations();
@@ -756,7 +643,6 @@ static bool validate_allowed_methods(const std::vector<Server> &servers,
     return true;
 }
 
-// ---- Asıl parse() şimdi sadece akışı koordine ediyor ----
 
 std::vector<Server> Config::parse(const std::string& filename)
 {
@@ -786,40 +672,30 @@ std::vector<Server> Config::parse(const std::string& filename)
         if (line.empty())
             continue;
 
-        // 1) "server {" açılışı
         if (start_server_block_if_needed(line, current_server, in_server_block))
             continue;
 
-        // 2) "}" ile server kapanışı
         if (end_server_block_if_needed(line, filename, line_number, in_server_block, in_location_block, current_server, servers))
             continue;
 
-        // 3) "location ... {" açılışı
         if (start_location_block_if_needed(line, filename, line_number, in_server_block, in_location_block, current_location, file, servers) == false)
         {
-            // Eğer fonksiyon false döndüyse iki ihtimal var:
-            //   a) Hiç match etmedi (normal akışa devam)
-            //   b) Match edip hata verdi (servers temizlendi) -> hemen dön
             if (servers.empty() && !in_server_block && !in_location_block && !file.good())
-                return servers; // fakat bu durum genelde fail_and_clear içinde file kapanır
+                return servers;
         }
         if (in_location_block && line.find("location") != std::string::npos)
-            continue; // zaten konfigüre edildi
+            continue;
 
-        // 4) "}" ile location kapanışı
         if (end_location_block_if_needed(line, in_location_block, current_server, current_location))
             continue;
 
-        // 5) Server bloğundaki direktifler
         if (in_server_block)
         {
             if (!process_server_directive_line(line, filename, line_number, file, servers, current_server, current_location, in_location_block))
                 return servers;
         }
-        // Server bloğu dışında gelen satırlar (boş/yorum gibi kabul edilebilir) -> yoksay
     }
 
-    // EOF kontrolleri
     if (in_server_block || in_location_block)
     {
         std::cerr << "webserv: unexpected end of file, expecting \"}\" in "
@@ -840,8 +716,7 @@ std::vector<Server> Config::parse(const std::string& filename)
     if (servers.empty())
         return servers;
 
-    // Metot doğrulaması
-    std::ifstream dummy(filename.c_str()); // sadece imza aynı kalsın diye
+    std::ifstream dummy(filename.c_str());
     if (!validate_allowed_methods(servers, dummy, servers))
         return servers;
 

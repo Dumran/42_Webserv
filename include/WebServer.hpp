@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   WebServer.hpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:14:12 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:30:08 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include <string>
@@ -34,7 +46,6 @@ public:
 
     void start();
 
-    // Eksik fonksiyon deklarasyonları
     int wait_for_events();
     bool is_server_index(int) const;
     bool is_client_index(int) const;

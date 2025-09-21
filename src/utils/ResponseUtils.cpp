@@ -1,33 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ResponseUtils.cpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:21:10 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:21:11 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "utils/ResponseUtils.hpp"
 #include <limits>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 #include <sys/stat.h>
-
-// std::string ResponseUtils::extractFileName(std::string request)
-// {
-//     size_t pos = request.find(" ");
-//     if (pos == std::string::npos)
-//     {
-//         return "";
-//     }
-
-//     size_t start = pos + 1;
-//     size_t end = request.find(" ", start);
-//     if (end == std::string::npos)
-//     {
-//         return "";
-//     }
-
-//     std::string path = request.substr(start, end - start);
-//     if (path == "/")
-//         return path;
-
-//     if (isDirectory(path))
-//         return path;
-//     return path;
-// }
 
 std::string ResponseUtils::extractFileName(std::string request)
 {

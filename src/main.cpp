@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:15:57 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:15:58 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <signal.h>
 
 void serverKill(int);
@@ -13,58 +25,6 @@ void serverKill(int);
 WebServer *g_server = NULL;
 std::vector<Config> config;
 std::vector<Server> pureServers;
-
-// void serverKill(int sig)
-// {
-//     (void)sig;
-//     (void)pureServers.empty();
-//     (void)config.empty();
-//     delete g_server;
-//     Log::info("Servers killed");
-//     exit(1);
-// }
-
-// void signalSetter()
-// {
-//     signal(SIGINT, serverKill);
-//     signal(SIGPIPE, SIG_IGN);
-//     signal(SIGTSTP, SIG_IGN);
-//     signal(SIGQUIT, SIG_IGN);
-// }
-
-// int main(int ac, char **av)
-// {
-//     if (ac == 2)
-//     {
-//         try
-//         {
-//             Log::info("Parsing configuration file.");
-//             pureServers = Config::parse(av[1]);
-
-//             if (pureServers.size() == 0)
-//             {
-//                 std::cout << "\033[31m";
-//                 std::cout << "[ERROR] " << Utils::getTime() << ": " << "No server found in the configuration file." << "\033[0m" << std::endl;
-//                 return (1);
-//             }
-//             config = Config::set(pureServers);
-//             Log::info("Configuration file parsed");
-//             g_server = new WebServer(config);
-//             signalSetter();
-//             g_server->start();
-//         }
-//         catch (std::exception &e)
-//         {
-//             std::cout << e.what() << std::endl;
-//             return (1);
-//         }
-//         return (0);
-//     }
-//     std::cerr << "Please try : ./webserv [configuration file]" << std::endl;
-//     return (1);
-// }
-
-// --- Yardımcılar ---
 
 static void ignore_signal(int sig) { signal(sig, SIG_IGN); }
 
@@ -113,8 +73,6 @@ static void init_and_launch_server()
     g_server->start();
 }
 
-// --- Orijinal fonksiyonlar (yeniden düzenlenmiş akışla) ---
-
 void serverKill(int sig)
 {
     (void)sig;
@@ -125,7 +83,6 @@ void serverKill(int sig)
 
 void signalSetter()
 {
-    // Eski imzayı koruyoruz; içeriden merkezileştirdik.
     setup_signal_handlers();
 }
 

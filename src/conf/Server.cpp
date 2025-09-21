@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mehkekli <mehkekli@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 15:20:37 by mehkekli          #+#    #+#             */
+/*   Updated: 2025/09/21 15:20:40 by mehkekli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "conf/Server.hpp"
 
 Server::Server() : client_max_body_size(1024 * 1024), port(0)
@@ -17,7 +29,7 @@ int Server::getPort() const
 {
     return port;
 }
-
+ // sadece imza aynı kalsın diye
 const std::string &Server::getHost() const
 {
     return host;

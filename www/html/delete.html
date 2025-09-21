@@ -21,9 +21,7 @@
             min-height: 100vh;
             background: #FF5722;
             background-image:
-                /* Lava/fire theme */
                 linear-gradient(180deg, #FF5722 0%, #F4511E 50%, #D84315 100%),
-                /* Fire flicker effect */
                 repeating-linear-gradient(
                     45deg,
                     transparent 0px,
@@ -42,7 +40,6 @@
             75% { filter: brightness(1.02); }
         }
 
-        /* Floating elements */
         body::before {
             content: '🗑️';
             position: fixed;
@@ -261,7 +258,6 @@
             box-shadow: 2px 2px 0px #b71c1c;
         }
 
-        /* Minecraft block pattern overlay */
         .container::after {
             content: '';
             position: absolute;
